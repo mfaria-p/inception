@@ -1,0 +1,3 @@
+$fastcgi_script_name → auto-set by Nginx when a .php request is matched.
+
+$fastcgi_path_info → set only if you use fastcgi_split_path_info (otherwise it’s empty).
