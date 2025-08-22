@@ -53,6 +53,24 @@ project/
          └──────────────────┘
 ```
 
+My stack has three main containers:
+
+### Nginx
+
+* Serves HTML, CSS, images, and static assets.
+* Passes PHP requests to WordPress (via PHP-FPM).
+
+### WordPress (PHP-FPM)
+
+* Contains the WordPress source code.
+* Executes PHP files (e.g., `index.php`, `wp-login.php`).
+* Talks to the database to fetch content.
+
+### Database (MariaDB/MySQL)
+
+* Stores WordPress data (users, posts, comments, settings).
+* WordPress connects with credentials defined in `wp-config.php`.
+
 ---
 
 ## 🔍 Service Roles
