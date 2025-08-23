@@ -7,6 +7,9 @@ RUN apk update && apk upgrade && apk add --no-cache \
 # www user + docroot
 RUN adduser -D -g 'www' www && mkdir -p /var/www && chown -R www:www /var/www
 
+# Ensure FPM listens on all interfaces, not just localhost
+RUN sed -i 's|^listen = .*|listen = 0.0.0.0:9000|' /etc/php84/php-fpm.d/www.conf
+
 COPY  requirements/wordpress/conf/wp-config-create.sh /usr/local/bin/wp-config-create.sh
 RUN chmod +x /usr/local/bin/wp-config-create.sh
 
