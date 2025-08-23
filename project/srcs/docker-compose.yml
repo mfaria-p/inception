@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  wordpress:
+    build:
+      context: .
+      dockerfile: requirements/wordpress/Dockerfile
+    container_name: wordpress
+    volumes:
+      - wordpress_data:/var/www/
+    restart: always
+
+  nginx:
+    build:
+      context: .
+      dockerfile: requirements/nginx/Dockerfile
+    container_name: nginx
+    depends_on:
+      - wordpress
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress_data:/var/www/:ro       # shared volume with WordPress
+      - ./requirements/nginx/conf/:/etc/nginx/http.d/  # nginx configs
+      - ./requirements/nginx/tools:/etc/nginx/ssl/     # ssl certs
+    restart: always
+
+volumes:
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${USER}/data/wordpress
