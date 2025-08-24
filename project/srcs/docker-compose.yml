@@ -6,9 +6,30 @@ services:
       context: .
       dockerfile: requirements/wordpress/Dockerfile
     container_name: wordpress
+    depends_on:
+      - mariadb
     volumes:
       - wordpress_data:/var/www/
     restart: always
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_password
+      MYSQL_HOST: mariadb
+
+  mariadb:
+    build:
+      context: .
+      dockerfile: requirements/mariadb/Dockerfile
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_password
+    volumes:
+      - mariadb_data:/var/lib/mysql
 
   nginx:
     build:
@@ -20,9 +41,9 @@ services:
     ports:
       - "443:443"
     volumes:
-      - wordpress_data:/var/www/:ro       # shared volume with WordPress
-      - ./requirements/nginx/conf/:/etc/nginx/http.d/  # nginx configs
-      - ./requirements/nginx/tools:/etc/nginx/ssl/     # ssl certs
+      - wordpress_data:/var/www/:ro
+      - ./requirements/nginx/conf/:/etc/nginx/http.d/
+      - ./requirements/nginx/tools:/etc/nginx/ssl/
     restart: always
 
 volumes:
@@ -32,3 +53,10 @@ volumes:
       type: none
       o: bind
       device: /home/${USER}/data/wordpress
+
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${USER}/data/mariadb

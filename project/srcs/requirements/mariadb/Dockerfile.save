@@ -6,8 +6,8 @@ RUN apk update && apk upgrade && apk add --no-cache mariadb mariadb-client
 RUN mkdir -p /run/mysqld /var/lib/mysql && chown -R mysql:mysql /run/mysqld /var/lib/mysql
 
 # Copy entrypoint
-COPY requirements/mariadb/conf/create_db.sh /usr/local/bin/create_db.sh
-RUN chmod +x /usr/local/bin/create_db.sh
+COPY conf/mariadb-init.sh /usr/local/bin/mariadb-init.sh
+RUN chmod +x /usr/local/bin/mariadb-init.sh
 
 EXPOSE 3306
-CMD ["/usr/local/bin/create_db.sh"]
+CMD ["/usr/local/bin/mariadb-init.sh"]
