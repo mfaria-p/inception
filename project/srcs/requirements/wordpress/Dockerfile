@@ -1,8 +1,28 @@
 FROM alpine:3.21
 
 RUN apk update && apk upgrade && apk add --no-cache \
-    php84 php84-fpm php84-mysqli php84-json php84-session php84-curl \
-    php84-dom php84-xml php84-zip php84-gd php84-opcache curl tar
+    php84 \
+    php84-fpm \
+    php84-cli \
+    php84-mysqli \
+    php84-json \
+    php84-session \
+    php84-curl \
+    php84-dom \
+    php84-xml \
+    php84-zip \
+    php84-gd \
+    php84-opcache \
+    php84-mbstring \
+    php84-phar \
+    php84-iconv \
+    mariadb-client \
+    curl \
+    wget \
+    tar \
+    unzip \
+    less \
+ && ln -s /usr/bin/php84 /usr/bin/php
 
 RUN adduser -D -g 'www' www && mkdir -p /var/www && chown -R www:www /var/www
 
