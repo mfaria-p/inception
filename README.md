@@ -1,30 +1,59 @@
-# 📦 Inception: WordPress + Nginx + MariaDB Docker Setup 
+# 📦 Inception: WordPress + Nginx + MariaDB Docker Setup
 
 ## 📌 Overview
-This project sets up a fully containerized WordPress site using **Docker Compose**, with three main services:
+Custom containerized WordPress site using **Docker Compose** with three Alpine-based services:
 
-- **Nginx** → Reverse proxy & HTTPS handler
-- **WordPress** → PHP-FPM application
-- **MariaDB** → Database backend
-
-Each service runs in its own container and communicates via a private Docker network.
+- **Nginx** → HTTPS termination & reverse proxy  
+- **WordPress** → PHP-FPM application with WP-CLI  
+- **MariaDB** → Database backend  
 
 ---
 
 ## 🗂 Project Structure
 ```plaintext
 project/
+├── Makefile
 └── srcs/
-    ├── docker-compose.yml           # Docker services definition
-    ├── .env                          # Environment variables
-    ├── requirements/
-    │   ├── nginx/                    # Nginx config & Dockerfile
-    │   ├── wordpress/                # WordPress config & Dockerfile
-    │   └── mariadb/                  # MariaDB config & Dockerfile
+    ├── docker-compose.yml
+    └── requirements/
+        ├── nginx/
+        │   ├── Dockerfile
+        │   ├── conf/nginx.conf
+        │   └── tools/              # SSL certificates
+        ├── wordpress/
+        │   ├── Dockerfile
+        │   └── conf/wp-config-create.sh
+        └── mariadb/
+            ├── Dockerfile
+            └── conf/
+                ├── create_db.sh
+                └── network.cnf
 ```
+
 ---
 
-## ⚙️ How It Works
+## 🚀 Quick Start
+
+```bash
+# Build and start
+make build
+
+# Stop services
+make down
+
+# Rebuild everything
+make re
+
+# Complete cleanup
+make fclean
+```
+
+**Access:** https://mfaria-p.42.fr
+
+---
+
+## ⚙️ Architecture
+
 ```pgsql
          ┌──────────────────┐
          │   Web Browser    │
@@ -53,40 +82,30 @@ project/
          └──────────────────┘
 ```
 
-My stack has three main containers:
-
-### Nginx
-
-* Serves HTML, CSS, images, and static assets.
-* Passes PHP requests to WordPress (via PHP-FPM).
-
-### WordPress (PHP-FPM)
-
-* Contains the WordPress source code.
-* Executes PHP files (e.g., `index.php`, `wp-login.php`).
-* Talks to the database to fetch content.
-
-### Database (MariaDB/MySQL)
-
-* Stores WordPress data (users, posts, comments, settings).
-* WordPress connects with credentials defined in `wp-config.php`.
+**Key Features:**
+- 🔒 HTTPS-only with TLS 1.2/1.3
+- 🐳 Custom Alpine images (no pre-built containers)
+- 📁 Persistent data with bind mounts
+- 🌐 Internal Docker networking
 
 ---
 
-## 🔍 Service Roles
-- **Nginx**
-  - Listens on ports **80** (HTTP) and **443** (HTTPS)
-  - Serves static content
-  - Forwards PHP requests to the WordPress container
+## 🔧 Services
 
-- **WordPress**
-  - Runs on PHP-FPM
-  - Handles dynamic content and business logic
-  - Connects to MariaDB to read/write site data
+### Nginx
+- SSL termination & static file serving
+- FastCGI proxy to WordPress container
+- Custom configuration for WordPress
 
-- **MariaDB**
-  - Stores all WordPress data (posts, users, settings)
-  - Secured with credentials from `.env`
+### WordPress  
+- PHP 8.4 with PHP-FPM
+- Automated setup with WP-CLI
+- Database connection management
+
+### MariaDB
+- Custom initialization script
+- Network configuration for container access
+- Persistent database storage
 
 ---
 
@@ -100,7 +119,13 @@ All communication between containers happens inside a **private Docker network**
 
 ---
 
-## 🚀 Running the Project
+## 📁 Data Persistence
+
 ```bash
-docker compose up --build
+# WordPress files
+/home/${USER}/data/wordpress
+
+# Database files  
+/home/${USER}/data/mariadb
 ```
+
